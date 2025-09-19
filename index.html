@@ -67,6 +67,11 @@
             padding: 1rem 0;
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            /* Fix for Chromium browsers flickering */
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            -webkit-font-smoothing: subpixel-antialiased;
+            will-change: transform;
         }
 
         .navbar.scrolled {
@@ -90,6 +95,10 @@
             color: #333;
             transition: all 0.3s ease;
             position: relative;
+            /* Fix for Chromium browsers flickering */
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            -webkit-font-smoothing: subpixel-antialiased;
         }
 
         .logo::before {
@@ -145,6 +154,10 @@
             position: relative;
             margin-right: 8px;
             vertical-align: middle;
+            /* Fix for Chromium browsers flickering */
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            -webkit-font-smoothing: subpixel-antialiased;
         }
 
         .custom-shield::before {
@@ -213,6 +226,10 @@
             font-size: 1rem;
             padding: 0.5rem 0;
             overflow: hidden;
+            /* Fix for Chromium browsers flickering */
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            -webkit-font-smoothing: subpixel-antialiased;
         }
 
         .nav-links a::before {
@@ -264,6 +281,10 @@
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             overflow: hidden;
+            /* Fix for Chromium browsers flickering */
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            -webkit-font-smoothing: subpixel-antialiased;
         }
 
         .github-link::before {
@@ -302,6 +323,11 @@
             cursor: pointer;
             z-index: 1001;
             transition: all 0.3s ease;
+            /* Fix for Chromium browsers flickering */
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            -webkit-font-smoothing: subpixel-antialiased;
+            will-change: transform;
         }
 
         .nav-toggle span {
@@ -1088,6 +1114,11 @@
                 box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
                 gap: 2rem;
                 z-index: 1000;
+                /* Fix for Chromium browsers flickering */
+                transform: translateZ(0);
+                backface-visibility: hidden;
+                -webkit-font-smoothing: subpixel-antialiased;
+                will-change: transform, right;
             }
             
             .nav-links.active {
