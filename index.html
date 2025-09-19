@@ -31,17 +31,24 @@
 
         html {
             scroll-behavior: smooth;
+            /* Optimize scrolling performance */
+            -webkit-overflow-scrolling: touch;
+            scroll-padding-top: 80px;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             line-height: 1.6;
             color: #333;
-            /* Prevent flickering */
+            /* Prevent flickering and optimize scrolling */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             transform-style: preserve-3d;
             backface-visibility: hidden;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            /* Force layer creation for smoother scrolling */
+            will-change: scroll-position;
         }
 
         /* Component Styles */
@@ -111,8 +118,6 @@
         .hero {
             padding: 120px 0 80px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            background-size: 200% 200%;
-            animation: gradientShift 15s ease infinite;
             color: white;
             opacity: 0;
             transform: translateY(20px);
@@ -125,6 +130,7 @@
             /* Prevent flickering */
             will-change: opacity, transform;
             backface-visibility: hidden;
+            contain: layout style paint;
         }
 
         @keyframes gradientShift {
@@ -283,22 +289,25 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        /* Scroll Animations */
+        /* Scroll Animations - Optimized */
         .animate-on-scroll {
             opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s ease;
+            transform: translate3d(0, 20px, 0);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            will-change: opacity, transform;
+            backface-visibility: hidden;
         }
 
         .animate-on-scroll.animate-in {
             opacity: 1;
-            transform: translateY(0);
+            transform: translate3d(0, 0, 0);
         }
 
         /* Features Section */
         .features {
             padding: 80px 0;
             background: #f9fafb;
+            contain: layout style;
         }
 
         .section-header {
@@ -369,6 +378,7 @@
         /* How It Works */
         .how-it-works {
             padding: 80px 0;
+            contain: layout style;
         }
 
         .steps {
@@ -415,6 +425,7 @@
         .download {
             padding: 80px 0;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            contain: layout style;
         }
 
         .download-card {
@@ -873,20 +884,36 @@
     <script>
         // Initialize hero animation
         document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(() => {
-                document.querySelector('.hero').classList.add('visible');
-            }, 100);
+            // Use requestAnimationFrame for smooth initial animation
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    document.querySelector('.hero').classList.add('visible');
+                }, 50);
+            });
 
-            // Set up intersection observer for scroll animations
+            // Optimized intersection observer with throttling
+            let isObserving = true;
             const observer = new IntersectionObserver(
                 (entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('animate-in');
-                        }
+                    if (!isObserving) return;
+
+                    // Throttle updates
+                    isObserving = false;
+                    requestAnimationFrame(() => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting && entry.intersectionRatio > 0.1) {
+                                entry.target.classList.add('animate-in');
+                                // Stop observing once animated to prevent re-triggering
+                                observer.unobserve(entry.target);
+                            }
+                        });
+                        isObserving = true;
                     });
                 },
-                { threshold: 0.1 }
+                {
+                    threshold: [0.1, 0.2],
+                    rootMargin: '0px 0px -50px 0px'
+                }
             );
 
             // Observe all sections
