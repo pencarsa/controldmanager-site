@@ -1,0 +1,900 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="ControlDManager - Manage ControlD DNS profiles effortlessly from your macOS menu bar. Switch DNS settings, enable filtering, and protect your privacy with just one click.">
+    <meta name="keywords" content="ControlD, DNS, macOS, menu bar, privacy, security, DNS filtering">
+    <title>ControlDManager - DNS Control at Your Fingertips</title>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* Component Styles */
+        .landing-page {
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+            padding: 1rem 0;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: bold;
+            font-size: 1.25rem;
+        }
+
+        .logo-icon {
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #007AFF;
+        }
+
+        .github-link {
+            color: #007AFF !important;
+            font-weight: 500;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 120px 0 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 15s ease infinite;
+            color: white;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease;
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hero-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            width: 100%;
+        }
+
+        .hero-content {
+            max-width: 600px;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: bold;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, #fff, #ffd700);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.95;
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #764ba2;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: white;
+            transform: translateY(-2px);
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* App Screenshot */
+        .hero-image {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .app-showcase {
+            position: relative;
+        }
+
+        .app-screenshot {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .app-screenshot:hover {
+            transform: scale(1.05);
+        }
+
+        .feature-badges {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Scroll Animations */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .animate-on-scroll.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+            background: #f9fafb;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 1rem;
+            color: #1a202c;
+        }
+
+        .section-header p {
+            font-size: 1.25rem;
+            color: #718096;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.15);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+        }
+
+        .feature-card p {
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        /* How It Works */
+        .how-it-works {
+            padding: 80px 0;
+        }
+
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            gap: 3rem;
+            margin-top: 3rem;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .step {
+            flex: 1;
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+        }
+
+        .step-content p {
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        /* Download Section */
+        .download {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .download-card {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .download-card h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #1a202c;
+        }
+
+        .download-card > p {
+            font-size: 1.1rem;
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        .build-instructions-main {
+            text-align: left;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .build-instructions-main h3 {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: #2d3748;
+        }
+
+        .build-steps {
+            background: #f7fafc;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .build-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .build-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-num {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .build-step code {
+            flex: 1;
+            background: #2d3748;
+            color: #48bb78;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .step-note {
+            margin-top: 0.5rem;
+            color: #718096;
+            font-size: 0.85rem;
+            margin-left: 46px;
+        }
+
+        .requirements {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .requirements h4 {
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        .requirements ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .requirements li {
+            padding-left: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            position: relative;
+        }
+
+        .requirements li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .build-instructions-main .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            max-width: fit-content;
+        }
+
+        /* Footer */
+        .footer {
+            background: #1a202c;
+            color: white;
+            padding: 3rem 0 1.5rem;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 2rem;
+        }
+
+        .footer-left .logo {
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .footer-left p {
+            color: #a0aec0;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            color: #a0aec0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #2d3748;
+            color: #718096;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .hero-wrapper {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-content {
+                margin: 0 auto;
+            }
+
+            .hero-actions {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .nav-links {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .hero {
+                padding: 100px 0 60px;
+                min-height: auto;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                text-align: center;
+            }
+
+            .steps {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .app-screenshot {
+                max-width: 350px;
+            }
+
+            .section-header h2 {
+                font-size: 2rem;
+            }
+
+            .features,
+            .how-it-works,
+            .download {
+                padding: 60px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="landing-page">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-content">
+                    <div class="logo">
+                        <span class="logo-icon">🛡️</span>
+                        <span class="logo-text">ControlDManager</span>
+                    </div>
+                    <div class="nav-links">
+                        <a href="#features">Features</a>
+                        <a href="#how-it-works">How It Works</a>
+                        <a href="#build">Build</a>
+                        <a href="https://github.com/pencarsa/controldmanager" target="_blank" class="github-link">
+                            GitHub
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero" id="hero">
+            <div class="container">
+                <div class="hero-wrapper">
+                    <div class="hero-content">
+                        <h1 class="hero-title">
+                            DNS Control at Your <span class="gradient-text">Fingertips</span>
+                        </h1>
+                        <p class="hero-subtitle">
+                            Manage ControlD profiles effortlessly from your macOS menu bar.
+                            Switch DNS settings, enable filtering, and protect your privacy with just one click.
+                        </p>
+                        <div class="hero-actions">
+                            <a href="#build" class="btn btn-primary">
+                                Build from Source
+                            </a>
+                            <a href="https://github.com/pencarsa/controldmanager" target="_blank" class="btn btn-secondary">
+                                View on GitHub
+                            </a>
+                        </div>
+                        <div class="hero-badge">
+                            <span>🍎 Requires macOS 11.0+</span>
+                        </div>
+                    </div>
+                    <div class="hero-image">
+                        <div class="app-showcase">
+                            <img src="controld-screenshot.png" alt="ControlDManager Interface" class="app-screenshot" />
+                            <div class="feature-badges">
+                                <div class="badge">✅ Native macOS App</div>
+                                <div class="badge">🔐 Secure Keychain Storage</div>
+                                <div class="badge">⚡ Instant Profile Switching</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="features animate-on-scroll">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Everything You Need for DNS Management</h2>
+                    <p>Powerful features designed for simplicity and security</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card animate-on-scroll">
+                        <div class="feature-icon">🚀</div>
+                        <h3>Lightning Fast</h3>
+                        <p>Switch between DNS profiles instantly from your menu bar</p>
+                    </div>
+                    <div class="feature-card animate-on-scroll">
+                        <div class="feature-icon">🔐</div>
+                        <h3>Secure Storage</h3>
+                        <p>API tokens stored safely in macOS Keychain with encryption</p>
+                    </div>
+                    <div class="feature-card animate-on-scroll">
+                        <div class="feature-icon">🎯</div>
+                        <h3>One-Click Control</h3>
+                        <p>Enable, disable, or switch profiles with a single click</p>
+                    </div>
+                    <div class="feature-card animate-on-scroll">
+                        <div class="feature-icon">⏰</div>
+                        <h3>Temporary Disable</h3>
+                        <p>Pause DNS filtering for one hour when needed</p>
+                    </div>
+                    <div class="feature-card animate-on-scroll">
+                        <div class="feature-icon">✨</div>
+                        <h3>Native Experience</h3>
+                        <p>Beautiful SwiftUI interface that feels right at home on macOS</p>
+                    </div>
+                    <div class="feature-card animate-on-scroll">
+                        <div class="feature-icon">🔄</div>
+                        <h3>Real-time Validation</h3>
+                        <p>Instant API key verification and profile synchronization</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section id="how-it-works" class="how-it-works">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Get Started in 3 Simple Steps</h2>
+                    <p>Setting up ControlDManager takes less than a minute</p>
+                </div>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Clone & Build</h3>
+                            <p>Clone the repository and build from source using the provided scripts</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Add Your API Token</h3>
+                            <p>Enter your ControlD API token - it's stored securely in your macOS Keychain</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Start Managing</h3>
+                            <p>Click the menu bar icon to switch profiles, enable filtering, or pause protection</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Build Section -->
+        <section id="build" class="download">
+            <div class="container">
+                <div class="download-card">
+                    <h2>Ready to Build?</h2>
+                    <p>Get ControlDManager running on your Mac in minutes</p>
+                    <div class="build-instructions-main">
+                        <h3>Build from Source</h3>
+                        <div class="build-steps">
+                            <div class="build-step">
+                                <span class="step-num">1</span>
+                                <code>git clone https://github.com/pencarsa/controldmanager.git</code>
+                            </div>
+                            <div class="build-step">
+                                <span class="step-num">2</span>
+                                <code>cd controldmanager</code>
+                            </div>
+                            <div class="build-step">
+                                <span class="step-num">3</span>
+                                <code>./build.sh</code>
+                                <p class="step-note">Run the build script to compile the app</p>
+                            </div>
+                        </div>
+                        <div class="requirements">
+                            <h4>Requirements</h4>
+                            <ul>
+                                <li>✓ macOS 11.0 Big Sur or later</li>
+                                <li>✓ Xcode 13+ installed</li>
+                                <li>✓ ControlD account with API access</li>
+                            </ul>
+                        </div>
+                        <a href="https://github.com/pencarsa/controldmanager" target="_blank" class="btn btn-primary">
+                            <span>📖</span> View Full Instructions on GitHub
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-left">
+                        <div class="logo">
+                            <span class="logo-icon">🛡️</span>
+                            <span class="logo-text">ControlDManager</span>
+                        </div>
+                        <p>The elegant way to manage ControlD on macOS</p>
+                    </div>
+                    <div class="footer-right">
+                        <div class="footer-links">
+                            <a href="https://github.com/pencarsa/controldmanager" target="_blank">GitHub</a>
+                            <a href="https://github.com/pencarsa/controldmanager/issues" target="_blank">Report Issue</a>
+                            <a href="https://controld.com" target="_blank">ControlD</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>Built with ❤️ for the privacy-conscious community</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize hero animation
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                document.querySelector('.hero').classList.add('visible');
+            }, 100);
+
+            // Set up intersection observer for scroll animations
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('animate-in');
+                        }
+                    });
+                },
+                { threshold: 0.1 }
+            );
+
+            // Observe all sections
+            document.querySelectorAll('.animate-on-scroll').forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>
