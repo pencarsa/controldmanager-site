@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='25' y='10' width='50' height='60' rx='10' fill='%235e72e4'/><polygon points='50,85 25,70 75,70' fill='%235e72e4'/><text x='50' y='45' font-size='40' fill='white' text-anchor='middle'>✓</text></svg>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="ControlDManager - Manage ControlD DNS profiles effortlessly from your macOS menu bar. Switch DNS settings, enable filtering, and protect your privacy with just one click.">
     <meta name="keywords" content="ControlD, DNS, macOS, menu bar, privacy, security, DNS filtering">
@@ -121,12 +121,87 @@
             background-clip: text;
             -webkit-text-fill-color: transparent;
             filter: drop-shadow(0 2px 4px rgba(94, 114, 228, 0.2));
+            position: relative;
+            display: inline-block;
+        }
+
+        .logo-icon::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: linear-gradient(135deg, rgba(94, 114, 228, 0.2), rgba(130, 94, 228, 0.2));
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        /* Create a custom shield icon with CSS */
+        .custom-shield {
+            display: inline-block;
+            width: 36px;
+            height: 40px;
+            position: relative;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .custom-shield::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 75%;
+            background: linear-gradient(135deg, #5e72e4 0%, #825ee4 100%);
+            border-radius: 18px 18px 0 0;
+            box-shadow: 0 4px 8px rgba(94, 114, 228, 0.3);
+        }
+
+        .custom-shield::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 18px solid transparent;
+            border-right: 18px solid transparent;
+            border-top: 10px solid #5e72e4;
+        }
+
+        .shield-check {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            z-index: 2;
         }
 
         .nav-links {
             display: flex;
             gap: 2.5rem;
             align-items: center;
+        }
+
+        .logo-image-container {
+            display: none;
+        }
+
+        .logo-image {
+            height: 32px;
+            width: auto;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .logo-image:hover {
+            transform: scale(1.05);
         }
 
         .nav-links a {
@@ -253,6 +328,19 @@
 
         .nav-toggle:hover span {
             background: linear-gradient(135deg, #825ee4 0%, #5e72e4 100%);
+        }
+
+        .mobile-logo-container {
+            display: none;
+            margin-bottom: 1.5rem;
+            width: 100%;
+            text-align: center;
+        }
+
+        .mobile-logo-image {
+            height: 40px;
+            width: auto;
+            border-radius: 6px;
         }
 
         /* Hero Section */
@@ -931,6 +1019,23 @@
             color: white;
         }
 
+        .footer-logo-container {
+            margin: 1rem 0;
+        }
+
+        .footer-logo-image {
+            height: 48px;
+            width: auto;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            opacity: 0.9;
+        }
+
+        .footer-logo-image:hover {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
         .footer-bottom {
             text-align: center;
             padding-top: 2rem;
@@ -987,6 +1092,10 @@
             
             .nav-links.active {
                 right: 0;
+            }
+            
+            .nav-links.active .mobile-logo-container {
+                display: block;
             }
             
             .nav-links a {
@@ -1073,7 +1182,9 @@
             <div class="container">
                 <div class="nav-content">
                     <div class="logo">
-                        <span class="logo-icon">🛡️</span>
+                        <div class="custom-shield">
+                            <div class="shield-check">✓</div>
+                        </div>
                         <span class="logo-text">ControlDManager</span>
                     </div>
                     <div class="nav-toggle">
@@ -1258,7 +1369,9 @@
                 <div class="footer-content">
                     <div class="footer-left">
                         <div class="logo">
-                            <span class="logo-icon">🛡️</span>
+                            <div class="custom-shield">
+                                <div class="shield-check">✓</div>
+                            </div>
                             <span class="logo-text">ControlDManager</span>
                         </div>
                         <p>The elegant way to manage ControlD on macOS</p>
