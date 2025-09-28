@@ -4,7 +4,7 @@ This is the static website for ControlDManager, a macOS menu bar application for
 
 ## 🚀 Live Demo
 
-Visit the live website at: [https://pencarsa.github.io/controldwebsite](https://pencarsa.github.io/controldwebsite)
+Visit the live website at: [https://pencarsa.github.io/controldwebsite](https://pencarsa.github.io/controldmanager-site/)
 
 ## 📁 Files
 
